@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İftar ve Sahur Saati</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #222;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2rem;
+        }
+        .date {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .countdown {
+            font-size: 3rem;
+            font-weight: bold;
+            background: #ffcc00;
+            color: black;
+            display: inline-block;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .message {
+            font-size: 2rem;
+            color: #ffcc00;
+            margin-top: 20px;
+        }
+        .city-buttons button {
+            background-color: #ffcc00;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 5px;
+            border-radius: 5px;
+        }
+        .city-buttons button:hover {
+            background-color: #e6b800;
+        }
+    </style>
+</head>
+<body>
+    <div class="date" id="date"></div>
+    <h1 id="city-name">İstanbul</h1>
+    <div class="countdown" id="countdown">--:--:--</div>
+    <div class="message" id="message"></div>
+    
+    <div class="city-buttons">
+        <button onclick="changeCity('İstanbul', 19, 26, 4, 50)">İstanbul</button>
+        <button onclick="changeCity('Ankara', 19, 19, 4, 45)">Ankara</button>
+        <button onclick="changeCity('İzmir', 19, 32, 5, 0)">İzmir</button>
+        <button onclick="changeCity('Bursa', 19, 28, 4, 55)">Bursa</button>
+        <button onclick="changeCity('Antalya', 19, 25, 4, 52)">Antalya</button>
+    </div>
+
+    <script>
+        let selectedCity = "İstanbul";
+        let iftarHour = 19, iftarMinute = 26;
+        let sahurHour = 4, sahurMinute = 50;
+
+        function getTime(hour, minute) {
+            const now = new Date();
+            const time = new Date(now);
+            time.setHours(hour, minute, 0, 0);
+            return time;
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const iftarTime = getTime(iftarHour, iftarMinute);
+            const sahurTime = getTime(sahurHour, sahurMinute);
+            dateElement.innerHTML = now.toLocaleDateString('tr-TR');
+            
+            if (now < iftarTime) {
+                updateDisplay(iftarTime - now, "İftara Kalan Süre");
+            } else if (now >= iftarTime && now < sahurTime) {
+                showMessage("Hayırlı İftarlar!");
+                setTimeout(() => updateDisplay(sahurTime - now, "Sahura Kalan Süre"), 300000); // 5 dakika sonra sahur süresi gösterilecek
+            } else {
+                const nextIftarTime = getTime(iftarHour + 24, iftarMinute);
+                updateDisplay(nextIftarTime - now, "İftara Kalan Süre");
+            }
+        }
+
+        function updateDisplay(timeLeft, label) {
+            const hours = String(Math.floor(timeLeft / (1000 * 60 * 60))).padStart(2, '0');
+            const minutes = String(Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+            const seconds = String(Math.floor((timeLeft % (1000 * 60)) / 1000)).padStart(2, '0');
+            countdownElement.innerHTML = `${label}: ${hours}:${minutes}:${seconds}`;
+            messageElement.innerHTML = "";
+        }
+
+        function showMessage(text) {
+            countdownElement.innerHTML = text;
+        }
+
+        function changeCity(city, hour, minute, sahurH, sahurM) {
+            selectedCity = city;
+            iftarHour = hour;
+            iftarMinute = minute;
+            sahurHour = sahurH;
+            sahurMinute = sahurM;
+            cityNameElement.innerHTML = city;
+            updateCountdown();
+        }
+
+        const countdownElement = document.getElementById('countdown');
+        const messageElement = document.getElementById('message');
+        const cityNameElement = document.getElementById('city-name');
+        const dateElement = document.getElementById('date');
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
